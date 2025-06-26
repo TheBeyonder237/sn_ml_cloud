@@ -5,3 +5,5 @@ xgboost
 matplotlib
 seaborn
 plotly
+streamlit-lottie
+streamlit-option-menu
