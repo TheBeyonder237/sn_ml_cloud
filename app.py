@@ -70,11 +70,11 @@ st.markdown("""
         box-sizing: border-box;
     }
     .main {
-        background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+        background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
         padding: 1rem;
     }
     .stButton>button {
-        background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%);
+        background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
         color: white;
         border-radius: 12px;
         padding: 12px 24px;
@@ -82,18 +82,19 @@ st.markdown("""
         font-weight: 500;
         font-size: 1rem;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
     .stButton>button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(20, 184, 166, 0.3);
-        background: linear-gradient(90deg, #0d9488 0%, #14b8a6 100%);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
     }
     .sidebar .sidebar-content {
         background: #ffffff;
-        border-right: 1px solid #e5e7eb;
+        border-right: 1px solid #d1d5db;
         padding: 1.5rem;
         border-radius: 0 12px 12px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
     .stSelectbox, .stNumberInput {
         border-radius: 8px;
@@ -106,18 +107,18 @@ st.markdown("""
         background: white;
     }
     .stProgress > div > div {
-        background: #14b8a6;
+        background: #d4af37;
     }
     .stMarkdown {
-        color: #1f2937;
+        color: #111827;
     }
     .stAlert {
         border-radius: 8px;
-        background: #f0fdf4;
-        color: #166534;
+        background: #dcfce7;
+        color: #15803d;
     }
     .section-card {
-        background: white;
+        background: #f9fafb;
         padding: 1.5rem;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -129,13 +130,13 @@ st.markdown("""
         transform: translateY(-4px);
     }
     .section-title {
-        color: #0d9488;
+        color: #1e40af;
         font-size: 1.8rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
     }
     .badge {
-        background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%);
+        background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
         color: white;
         border-radius: 8px;
         padding: 0.4rem 0.8rem;
@@ -146,12 +147,12 @@ st.markdown("""
     }
     .about-avatar {
         border-radius: 50%;
-        border: 3px solid #14b8a6;
-        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+        border: 3px solid #d4af37;
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
         margin-bottom: 1rem;
     }
     .about-contact-btn {
-        background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%);
+        background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
         color: white;
         border-radius: 10px;
         padding: 0.6rem 1.2rem;
@@ -161,7 +162,7 @@ st.markdown("""
         transition: all 0.3s ease;
     }
     .about-contact-btn:hover {
-        background: linear-gradient(90deg, #0d9488 0%, #14b8a6 100%);
+        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
         transform: translateY(-2px);
     }
     .card-fade {
@@ -177,13 +178,13 @@ st.markdown("""
     }
     .section-sep {
         border: none;
-        border-top: 1px solid #e5e7eb;
+        border-top: 1px solid #d1d5db;
         margin: 2rem 0;
         width: 100%;
     }
     .section-title-visual {
         font-size: 1.6rem;
-        color: #1f2937;
+        color: #111827;
         font-weight: 600;
         margin-bottom: 1rem;
     }
@@ -200,13 +201,13 @@ st.markdown("""
         transform: translateY(-2px);
     }
     .metric-card {
-        background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%);
+        background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
         color: white;
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         text-align: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
     .metric-card h3 {
         font-size: 1.5rem;
@@ -226,7 +227,7 @@ st.markdown("""
         border-bottom: none;
     }
     .header-container {
-        background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
         color: white;
         padding: 2rem;
         border-radius: 12px;
@@ -262,17 +263,17 @@ with st.sidebar:
         default_index=0,
         styles={
             "container": {"padding": "0!important", "background": "transparent"},
-            "icon": {"color": "#14b8a6", "font-size": "18px"},
+            "icon": {"color": "#3b82f6", "font-size": "18px"},
             "nav-link": {
                 "font-size": "15px",
                 "text-align": "left",
                 "margin": "4px 0",
                 "padding": "10px",
                 "--hover-color": "#e6f3f2",
-                "color": "#1f2937",
+                "color": "#111827",
             },
             "nav-link-selected": {
-                "background": "#14b8a6",
+                "background": "#3b82f6",
                 "color": "white",
                 "border-radius": "8px",
             },
@@ -320,8 +321,8 @@ if selected == "Accueil":
 # --------- PRÉDICTION ---------
 elif selected == "Prédiction":
     st.markdown("""
-        <divsubj class='header-container card-fade'>
-            <h1 class='section-title' style='color:black;'>🔮 Prédiction des Dépenses</h1>
+        <div class='header-container card-fade'>
+            <h1 class='section-title' style='color:white;'>🔮 Prédiction des Dépenses</h1>
             <p style='font-size:1.1rem;'>Entrez les informations du client pour estimer ses dépenses annuelles par carte de crédit.</p>
         </div>
     """, unsafe_allow_html=True)
@@ -382,7 +383,7 @@ elif selected == "Prédiction":
                 fig.add_trace(go.Bar(
                     x=["Prédite", "Réelle"],
                     y=[y_pred, real_expenditure],
-                    marker_color=["#14b8a6", "#0d9488"]
+                    marker_color=["#3b82f6", "#1e40af"]
                 ))
                 fig.update_layout(
                     title="Prédiction vs Réalité",
@@ -449,19 +450,19 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>1. Prédictions vs Valeurs Réelles</h4>
-            <p style='color:#4b5563;'>Chaque point représente un client. Plus les points sont proches de la diagonale, plus la prédiction est précise.</p>
+            <p style='color:#6b7280;'>Chaque point représente un client. Plus les points sont proches de la diagonale, plus la prédiction est précise.</p>
     """, unsafe_allow_html=True)
     fig1 = px.scatter(
         x=y, y=y_pred,
         labels={'x': 'Valeur Réelle ($)', 'y': 'Valeur Prédite ($)'},
-        color_discrete_sequence=["#14b8a6"],
+        color_discrete_sequence=["#3b82f6"],
         template="plotly_white"
     )
     fig1.add_shape(
         type="line",
         x0=y.min(), y0=y.min(),
         x1=y.max(), y1=y.max(),
-        line=dict(color="#f43f5e", dash="dash")
+        line=dict(color="#d4af37", dash="dash")
     )
     fig1.update_layout(showlegend=False, height=350, margin=dict(l=20, r=20, t=30, b=20))
     st.plotly_chart(fig1, use_container_width=True)
@@ -471,11 +472,11 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>2. Distribution des Dépenses</h4>
-            <p style='color:#4b5563;'>Répartition des dépenses annuelles des clients.</p>
+            <p style='color:#6b7280;'>Répartition des dépenses annuelles des clients.</p>
     """, unsafe_allow_html=True)
     fig2 = px.histogram(
         df, x="expenditure", nbins=40,
-        color_discrete_sequence=["#0d9488"],
+        color_discrete_sequence=["#1e40af"],
         template="plotly_white"
     )
     fig2.update_layout(
@@ -491,7 +492,7 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>3. Importance des Variables</h4>
-            <p style='color:#4b5563;'>Variables les plus influentes dans le modèle de prédiction.</p>
+            <p style='color:#6b7280;'>Variables les plus influentes dans le modèle de prédiction.</p>
     """, unsafe_allow_html=True)
     if hasattr(model, "feature_importances_"):
         importances = model.feature_importances_
@@ -503,7 +504,7 @@ elif selected == "Analyse":
             x="Importance", y="Variable", 
             orientation="h", 
             color="Importance",
-            color_continuous_scale=["#14b8a6", "#0d9488"],
+            color_continuous_scale=["#3b82f6", "#1e40af"],
             template="plotly_white",
             height=350
         )
@@ -517,12 +518,12 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>4. Dépenses par Statut de Propriétaire</h4>
-            <p style='color:#4b5563;'>Comparaison des dépenses entre propriétaires et non-propriétaires.</p>
+            <p style='color:#6b7280;'>Comparaison des dépenses entre propriétaires et non-propriétaires.</p>
     """, unsafe_allow_html=True)
     fig4 = px.box(
         df, x="owner", y="expenditure", 
         color="owner", 
-        color_discrete_sequence=["#14b8a6", "#0d9488"],
+        color_discrete_sequence=["#3b82f6", "#1e40af"],
         points="all",
         template="plotly_white",
         height=320
@@ -540,13 +541,13 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>5. Matrice de Corrélation</h4>
-            <p style='color:#4b5563;'>Relations linéaires entre les variables du jeu de données.</p>
+            <p style='color:#6b7280;'>Relations linéaires entre les variables du jeu de données.</p>
     """, unsafe_allow_html=True)
     corr = df.select_dtypes(include=[np.number]).corr()
     fig5 = px.imshow(
         corr, 
         text_auto=".2f", 
-        color_continuous_scale=["#f0f4f8", "#14b8a6"],
+        color_continuous_scale=["#f9fafb", "#3b82f6"],
         aspect="auto", 
         template="plotly_white",
         height=400
