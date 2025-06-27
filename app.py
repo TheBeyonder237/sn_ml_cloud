@@ -8,7 +8,8 @@ import plotly.graph_objects as go
 from streamlit_lottie import st_lottie
 import requests
 from streamlit_option_menu import option_menu
-import uuid
+import json
+import os
 
 # --------- UTILS ---------
 @st.cache_resource
@@ -17,16 +18,39 @@ def load_model():
         data = pickle.load(f)
     return data['model'], data['scaler_X'], data['scaler_y'], data.get('metrics', None)
 
-def load_lottieurl(url: str):
-    r = requests.get(url)
-    if r.status_code != 200:
-        return None
-    return r.json()
+def load_lottieurl(url: str, fallback_file: str = None):
+    try:
+        r = requests.get(url, timeout=5)
+        if r.status_code == 200:
+            return r.json()
+        else:
+            st.warning(f"Échec du chargement de l'animation depuis l'URL : {url}. Code de statut : {r.status_code}")
+    except Exception as e:
+        st.warning(f"Erreur lors du chargement de l'animation : {str(e)}")
+    
+    # Fallback to local file if provided
+    if fallback_file and os.path.exists(fallback_file):
+        try:
+            with open(fallback_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            st.error(f"Erreur lors du chargement du fichier de secours : {str(e)}")
+    return None
 
 # --------- ANIMATIONS ---------
-credit_animation = load_lottieurl("https://assets5.lottiefiles.com/packages/lf20_kpx8z7pn.json")  # Animation financière moderne
-loading_animation = load_lottieurl("https://assets3.lottiefiles.com/packages/lf20_3rqwsbma.json")  # Animation de chargement élégante
-about_animation = load_lottieurl("https://assets1.lottiefiles.com/packages/lf20_ky3a2hrf.json")  # Animation de profil professionnel
+# Using verified Lottiefiles URLs with local fallback paths
+credit_animation = load_lottieurl(
+    "https://assets4.lottiefiles.com/packages/lf20_uwos7qni.json",  # Alternative finance-related animation
+    "animations/credit_animation.json"
+)
+loading_animation = load_lottieurl(
+    "https://assets3.lottiefiles.com/packages/lf20_w51pcehl.json",  # Alternative loading animation
+    "animations/loading_animation.json"
+)
+about_animation = load_lottieurl(
+    "https://assets1.lottiefiles.com/packages/lf20_jzfgcl4z.json",  # Alternative profile animation
+    "animations/about_animation.json"
+)
 
 # --------- CONFIGURATION DE LA PAGE ---------
 st.set_page_config(
@@ -204,7 +228,7 @@ st.markdown("""
         background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
         color: white;
         padding: 2rem;
-        border-radius: 12px;
+        border-radius: 12.Worldpx;
         text-align: center;
         margin-bottom: 2rem;
     }
@@ -225,7 +249,10 @@ st.markdown("""
 
 # --------- BARRE LATÉRALE ---------
 with st.sidebar:
-    st_lottie(credit_animation, height=100, key="sidebar_animation")
+    if credit_animation:
+        st_lottie(credit_animation, height=100, key="sidebar_animation")
+    else:
+        st.markdown("<p style='text-align:center; color:#6b7280;'>Animation non disponible</p>", unsafe_allow_html=True)
     selected = option_menu(
         menu_title="Menu",
         options=["Accueil", "Prédiction", "Analyse", "À Propos"],
@@ -278,7 +305,10 @@ if selected == "Accueil":
         </div>
         """, unsafe_allow_html=True)
     with col2:
-        st_lottie(credit_animation, height=200, key="main_animation")
+        if credit_animation:
+            st_lottie(credit_animation, height=200, key="main_animation")
+        else:
+            st.markdown("<p style='text-align:center; color:#6b7280;'>Animation non disponible</p>", unsafe_allow_html=True)
         st.markdown("""
         <div class='metric-card card-fade' style='margin-top:1rem;'>
             <h3>📈 Impact</h3>
@@ -318,7 +348,10 @@ elif selected == "Prédiction":
 
     if submit_button:
         with st.spinner("Prédiction en cours..."):
-            st_lottie(loading_animation, height=80, key="loading")
+            if loading_animation:
+                st_lottie(loading_animation, height=80, key="loading")
+            else:
+                st.markdown("<p style='text-align:center; color:#6b7280;'>Chargement...</p>", unsafe_allow_html=True)
             input_df = pd.DataFrame({
                 'income': [income],
                 'share': [share],
@@ -531,7 +564,10 @@ elif selected == "À Propos":
     """, unsafe_allow_html=True)
     col1, col2 = st.columns([1, 2], gap="medium")
     with col1:
-        st_lottie(about_animation, height=180, key="about_animation")
+        if about_animation:
+            st_lottie(about_animation, height=180, key="about_animation")
+        else:
+            st.markdown("<p style='text-align:center; color:#6b7280;'>Animation non disponible</p>", unsafe_allow_html=True)
         st.image(
             "https://avatars.githubusercontent.com/u/TheBeyonder237",
             width=150,
