@@ -574,7 +574,7 @@ elif selected == "À Propos":
             width=150,
             caption="Ngoue David",
             output_format="auto",
-            use_column_width=False
+            use_container_width=False
         )
         st.markdown("""
         <div style='text-align:center; margin-top:1rem;'>
