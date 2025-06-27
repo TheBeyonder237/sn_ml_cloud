@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import pickle
-from PIL import Image
 import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_lottie import st_lottie
@@ -19,15 +18,12 @@ def load_model():
     return data['model'], data['scaler_X'], data['scaler_y'], data.get('metrics', None)
 
 def load_lottieurl(url: str, local_file: str = None):
-    # Try loading local file first
     if local_file and os.path.exists(local_file):
         try:
             with open(local_file, 'r') as f:
                 return json.load(f)
         except Exception as e:
             st.warning(f"Erreur lors du chargement du fichier local {local_file} : {str(e)}")
-    
-    # Fallback to URL if local file fails or doesn't exist
     try:
         r = requests.get(url, timeout=5)
         if r.status_code == 200:
@@ -39,17 +35,16 @@ def load_lottieurl(url: str, local_file: str = None):
     return None
 
 # --------- ANIMATIONS ---------
-# Prioritize local files, with new URLs as fallback
 credit_animation = load_lottieurl(
-    "https://lottie.host/8f7a5303-d6fc-4f53-a251-83e668af0dde/K2g0gSOKlQ.json",  # Finance-related animation
+    "https://lottie.host/8f7a5303-d6fc-4f53-a251-83e668af0dde/K2g0gSOKlQ.json",
     "animations/credit_animation.json"
 )
 loading_animation = load_lottieurl(
-    "https://lottie.host/7b6e1d43-4b53-4124-90e0-2a0f10d4eaff/6q3nNaM8zT.json",  # Loading animation
+    "https://lottie.host/7b6e1d43-4b53-4124-90e0-2a0f10d4eaff/6q3nNaM8zT.json",
     "animations/loading_animation.json"
 )
 about_animation = load_lottieurl(
-    "https://lottie.host/4e8f2a3b-0e32-4a98-9e1c-6e94e5d39e2a/6d5w1O8pY8.json",  # Profile-related animation
+    "https://lottie.host/4e8f2a3b-0e32-4a98-9e1c-6e94e5d39e2a/6d5w1O8pY8.json",
     "animations/about_animation.json"
 )
 
@@ -64,111 +59,164 @@ st.set_page_config(
 # --------- CSS ---------
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
     * {
         font-family: 'Inter', sans-serif;
         box-sizing: border-box;
+        margin: 0;
+        padding: 0;
     }
     .main {
-        background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
-        padding: 1rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 2rem;
+        min-height: 100vh;
     }
     .stButton>button {
-        background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+        background: linear-gradient(90deg, #2563eb 0%, #1e3a8a 100%);
         color: white;
-        border-radius: 12px;
+        border-radius: 10px;
         padding: 12px 24px;
         border: none;
+        font-family: 'Poppins', sans-serif;
         font-weight: 500;
         font-size: 1rem;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        position: relative;
+        overflow: hidden;
     }
     .stButton>button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
-        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 100%);
+    }
+    .stButton>button::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s ease, height 0.4s ease;
+    }
+    .stButton>button:hover::after {
+        width: 200px;
+        height: 200px;
     }
     .sidebar .sidebar-content {
-        background: #ffffff;
-        border-right: 1px solid #d1d5db;
-        padding: 1.5rem;
-        border-radius: 0 12px 12px 0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(209, 213, 219, 0.5);
+        padding: 2rem;
+        border-radius: 0 16px 16px 0;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
     }
     .stSelectbox, .stNumberInput {
-        border-radius: 8px;
-        background: #f9fafb;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.9);
         padding: 0.5rem;
+        backdrop-filter: blur(5px);
     }
     .stSelectbox > div > div, .stNumberInput > div > div {
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        background: white;
+        border: 1px solid rgba(209, 213, 219, 0.5);
+        border-radius: 10px;
+        background: transparent;
+        transition: border-color 0.3s ease;
+    }
+    .stSelectbox > div > div:hover, .stNumberInput > div > div:hover {
+        border-color: #2563eb;
     }
     .stProgress > div > div {
-        background: #d4af37;
+        background: #ca8a04;
+        border-radius: 10px;
     }
     .stMarkdown {
-        color: #111827;
+        color: #1f2937;
     }
     .stAlert {
-        border-radius: 8px;
-        background: #dcfce7;
+        border-radius: 10px;
+        background: rgba(220, 252, 231, 0.9);
         color: #15803d;
+        backdrop-filter: blur(5px);
+        padding: 1rem;
     }
     .section-card {
-        background: #f9fafb;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
         transition: all 0.3s ease;
+        border: 1px solid rgba(209, 213, 219, 0.3);
     }
     .section-card:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     }
     .section-title {
-        color: #1e40af;
-        font-size: 1.8rem;
+        font-family: 'Poppins', sans-serif;
+        color: #1e3a8a;
+        font-size: 2rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     .badge {
-        background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+        background: linear-gradient(90deg, #2563eb 0%, #1e3a8a 100%);
         color: white;
-        border-radius: 8px;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
         font-weight: 500;
-        margin: 0.2rem;
+        margin: 0.3rem;
         display: inline-block;
+        animation: pulse 2s infinite;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
     }
     .about-avatar {
         border-radius: 50%;
-        border: 3px solid #d4af37;
-        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
-        margin-bottom: 1rem;
+        border: 4px solid #ca8a04;
+        box-shadow: 0 4px 16px rgba(202, 138, 4, 0.3);
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+    .about-avatar:hover {
+        transform: scale(1.05);
     }
     .about-contact-btn {
-        background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+        background: linear-gradient(90deg, #2563eb 0%, #1e3a8a 100%);
         color: white;
-        border-radius: 10px;
-        padding: 0.6rem 1.2rem;
+        border-radius: 20px;
+        padding: 0.75rem 1.5rem;
         border: none;
+        font-family: 'Poppins', sans-serif;
         font-weight: 500;
-        margin: 0.3rem;
+        margin: 0.5rem;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
     }
     .about-contact-btn:hover {
-        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 100%);
         transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
     }
     .card-fade {
         opacity: 0;
-        transform: translateY(20px);
-        animation: fadeInUp 0.6s ease-out forwards;
+        transform: translateY(30px);
+        animation: fadeInUp 0.8s ease-out forwards;
     }
     @keyframes fadeInUp {
         to {
@@ -178,40 +226,48 @@ st.markdown("""
     }
     .section-sep {
         border: none;
-        border-top: 1px solid #d1d5db;
+        border-top: 1px solid rgba(209, 213, 219, 0.5);
         margin: 2rem 0;
         width: 100%;
     }
     .section-title-visual {
-        font-size: 1.6rem;
-        color: #111827;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.75rem;
+        color: #1f2937;
         font-weight: 600;
         margin-bottom: 1rem;
     }
     .visual-card {
-        background: #f9fafb;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
+        border: 1px solid rgba(209, 213, 219, 0.3);
     }
     .visual-card:hover {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        transform: translateY(-2px);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     }
     .metric-card {
-        background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+        background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
         color: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
         text-align: center;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 8px 32px rgba(37, 99, 235, 0.3);
+        transition: all 0.3s ease;
+    }
+    .metric-card:hover {
+        transform: scale(1.02);
     }
     .metric-card h3 {
-        font-size: 1.5rem;
-        margin-bottom: 0.8rem;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
     }
     .metric-list {
         list-style: none;
@@ -219,22 +275,68 @@ st.markdown("""
         font-size: 1rem;
     }
     .metric-list li {
-        margin: 0.5rem 0;
+        margin: 0.75rem 0;
         padding: 0.5rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     }
     .metric-list li:last-child {
         border-bottom: none;
     }
     .header-container {
-        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
         color: white;
-        padding: 2rem;
-        border-radius: 12px;
+        padding: 3rem 2rem;
+        border-radius: 16px;
         text-align: center;
         margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(37, 99, 235, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .header-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1), transparent);
+        z-index: 0;
+    }
+    .header-container > * {
+        position: relative;
+        z-index: 1;
+    }
+    .input-label {
+        font-size: 0.9rem;
+        color: #4b5563;
+        position: absolute;
+        top: -10px;
+        left: 12px;
+        background: transparent;
+        padding: 0 4px;
+        transition: all 0.3s ease;
+    }
+    .stNumberInput label, .stSelectbox label {
+        font-size: 0.9rem;
+        color: #4b5563;
+        font-weight: 500;
+    }
+    .footer {
+        text-align: center;
+        color: #4b5563;
+        padding: 2rem;
+        font-size: 0.9rem;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        margin-top: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
     @media (max-width: 768px) {
+        .main {
+            padding: 1rem;
+        }
         .section-title {
             font-size: 1.5rem;
         }
@@ -244,6 +346,13 @@ st.markdown("""
         }
         .sidebar .sidebar-content {
             padding: 1rem;
+            border-radius: 0;
+        }
+        .header-container {
+            padding: 2rem 1rem;
+        }
+        .section-card, .visual-card, .metric-card {
+            padding: 1.5rem;
         }
     }
     </style>
@@ -251,31 +360,36 @@ st.markdown("""
 
 # --------- BARRE LATÉRALE ---------
 with st.sidebar:
+    st.markdown("<div class='section-card' style='text-align:center; padding: 1rem;'>", unsafe_allow_html=True)
     if credit_animation:
-        st_lottie(credit_animation, height=100, key="sidebar_animation")
+        st_lottie(credit_animation, height=120, key="sidebar_animation")
     else:
-        st.markdown("<p style='text-align:center; color:#6b7280;'>Animation non disponible</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align:center; color:#4b5563; font-size:0.9rem;'>Animation non disponible</p>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
     selected = option_menu(
-        menu_title="Menu",
+        menu_title="Navigation",
         options=["Accueil", "Prédiction", "Analyse", "À Propos"],
-        icons=['house', 'credit-card', 'bar-chart', 'info-circle'],
-        menu_icon="menu-app",
+        icons=['house-fill', 'credit-card-2-front-fill', 'graph-up', 'info-circle-fill'],
+        menu_icon="menu-button-wide-fill",
         default_index=0,
         styles={
-            "container": {"padding": "0!important", "background": "transparent"},
-            "icon": {"color": "#3b82f6", "font-size": "18px"},
+            "container": {"padding": "0.5rem", "background": "transparent"},
+            "icon": {"color": "#2563eb", "font-size": "20px"},
             "nav-link": {
-                "font-size": "15px",
+                "font-family": "'Poppins', sans-serif",
+                "font-size": "16px",
                 "text-align": "left",
                 "margin": "4px 0",
-                "padding": "10px",
-                "--hover-color": "#e6f3f2",
-                "color": "#111827",
+                "padding": "12px",
+                "--hover-color": "rgba(37, 99, 235, 0.1)",
+                "color": "#1f2937",
+                "border-radius": "8px",
             },
             "nav-link-selected": {
-                "background": "#3b82f6",
+                "background": "linear-gradient(90deg, #2563eb 0%, #1e3a8a 100%)",
                 "color": "white",
                 "border-radius": "8px",
+                "font-weight": "500",
             },
         }
     )
@@ -284,37 +398,39 @@ with st.sidebar:
 if selected == "Accueil":
     st.markdown("""
         <div class='header-container card-fade'>
-            <h1 class='section-title' style='color:white; font-size:2.5rem;'>💸 Prédicteur de Dépenses par Carte de Crédit</h1>
-            <p style='font-size:1.2rem; margin-bottom:1rem;'>Utilisez l'IA pour prédire et optimiser les dépenses annuelles de vos clients par carte de crédit.</p>
+            <h1 class='section-title' style='color:white; font-size:3rem;'>💸 Prédicteur de Dépenses</h1>
+            <p style='font-size:1.2rem; margin-bottom:1rem; color:#f8fafc;'>Anticipez et optimisez les dépenses annuelles par carte de crédit avec l'intelligence artificielle.</p>
         </div>
     """, unsafe_allow_html=True)
-    col1, col2 = st.columns([1.3, 1], gap="medium")
+    col1, col2 = st.columns([1.4, 1], gap="large")
     with col1:
         st.markdown("""
         <div class='section-card card-fade'>
             <h3 class='section-title'>🎯 Notre Mission</h3>
-            <p>Fournir aux professionnels de la finance un outil intuitif basé sur l'IA pour prédire les dépenses annuelles des clients en fonction de leurs profils financiers et personnels.</p>
+            <p style='color:#4b5563; font-size:1rem;'>Offrir aux professionnels de la finance une solution IA intuitive pour prévoir les dépenses annuelles des clients en fonction de leurs profils financiers et personnels.</p>
         </div>
         <div class='section-card card-fade'>
-            <h3 class='section-title'>🔬 Technologies</h3>
-            <span class='badge'>Random Forest</span>
-            <span class='badge'>XGBoost</span>
-            <span class='badge'>SVR</span>
-            <span class='badge'>GridSearchCV</span>
-            <span class='badge'>Scikit-learn</span>
-            <span class='badge'>Streamlit</span>
-            <span class='badge'>Plotly</span>
+            <h3 class='section-title'>🔬 Technologies Utilisées</h3>
+            <div style='display:flex; flex-wrap:wrap; gap:0.5rem;'>
+                <span class='badge'>Random Forest</span>
+                <span class='badge'>XGBoost</span>
+                <span class='badge'>SVR</span>
+                <span class='badge'>GridSearchCV</span>
+                <span class='badge'>Scikit-learn</span>
+                <span class='badge'>Streamlit</span>
+                <span class='badge'>Plotly</span>
+            </div>
         </div>
         """, unsafe_allow_html=True)
     with col2:
         if credit_animation:
-            st_lottie(credit_animation, height=200, key="main_animation")
+            st_lottie(credit_animation, height=220, key="main_animation")
         else:
-            st.markdown("<p style='text-align:center; color:#6b7280;'>Animation non disponible</p>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align:center; color:#4b5563; font-size:0.9rem;'>Animation non disponible</p>", unsafe_allow_html=True)
         st.markdown("""
-        <div class='metric-card card-fade' style='margin-top:1rem;'>
+        <div class='metric-card card-fade'>
             <h3>📈 Impact</h3>
-            <p style='font-size:1.1rem; margin:0;'>Plus de <b>2 000</b> clients analysés</p>
+            <p style='font-size:1.2rem; margin:0; font-family:"Poppins", sans-serif;'>Plus de <b>2 000</b> clients analysés</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -322,38 +438,38 @@ if selected == "Accueil":
 elif selected == "Prédiction":
     st.markdown("""
         <div class='header-container card-fade'>
-            <h1 class='section-title' style='color:white;'>🔮 Prédiction des Dépenses</h1>
-            <p style='font-size:1.1rem;'>Entrez les informations du client pour estimer ses dépenses annuelles par carte de crédit.</p>
+            <h1 class='section-title' style='color:white;'>🔮 Prévoir les Dépenses</h1>
+            <p style='font-size:1.2rem; color:#f8fafc;'>Saisissez les données du client pour estimer ses dépenses annuelles par carte de crédit.</p>
         </div>
     """, unsafe_allow_html=True)
     with st.form("prediction_form"):
         st.markdown("<div class='section-card card-fade'>", unsafe_allow_html=True)
-        col1, col2 = st.columns(2, gap="medium")
+        col1, col2 = st.columns(2, gap="large")
         with col1:
             st.markdown("<h4 class='section-title'>Informations Personnelles</h4>", unsafe_allow_html=True)
-            age = st.number_input("Âge", min_value=18, max_value=100, value=35, step=1)
-            owner = st.selectbox("Propriétaire d'une maison", ["Non", "Oui"])
-            selfemp = st.selectbox("Travailleur indépendant", ["Non", "Oui"])
-            dependents = st.number_input("Personnes à charge", min_value=0, max_value=10, value=0, step=1)
+            age = st.number_input("Âge", min_value=18, max_value=100, value=35, step=1, help="Âge du client")
+            owner = st.selectbox("Propriétaire d'une maison", ["Non", "Oui"], help="Statut de propriété")
+            selfemp = st.selectbox("Travailleur indépendant", ["Non", "Oui"], help="Statut d'emploi")
+            dependents = st.number_input("Personnes à charge", min_value=0, max_value=10, value=0, step=1, help="Nombre de personnes à charge")
         with col2:
             st.markdown("<h4 class='section-title'>Informations Financières</h4>", unsafe_allow_html=True)
-            income = st.number_input("Revenu annuel ($)", min_value=0, max_value=500000, value=50000, step=1000)
-            share = st.slider("Part du revenu sur la carte (%)", min_value=0, max_value=100, value=10)
-            reports = st.number_input("Rapports de crédit", min_value=0, max_value=20, value=2, step=1)
-            months = st.number_input("Ancienneté du compte (mois)", min_value=0, max_value=240, value=12, step=1)
-            majorcards = st.number_input("Cartes principales", min_value=0, max_value=5, value=1, step=1)
-            active = st.number_input("Comptes actifs", min_value=0, max_value=10, value=2, step=1)
+            income = st.number_input("Revenu annuel ($)", min_value=0, max_value=500000, value=50000, step=1000, help="Revenu annuel en dollars")
+            share = st.slider("Part du revenu sur la carte (%)", min_value=0, max_value=100, value=10, help="Pourcentage du revenu dépensé via carte")
+            reports = st.number_input("Rapports de crédit", min_value=0, max_value=20, value=2, step=1, help="Nombre de rapports de crédit")
+            months = st.number_input("Ancienneté du compte (mois)", min_value=0, max_value=240, value=12, step=1, help="Durée du compte en mois")
+            majorcards = st.number_input("Cartes principales", min_value=0, max_value=5, value=1, step=1, help="Nombre de cartes principales")
+            active = st.number_input("Comptes actifs", min_value=0, max_value=10, value=2, step=1, help="Nombre de comptes actifs")
         st.markdown("<hr class='section-sep'/>", unsafe_allow_html=True)
-        real_expenditure = st.number_input("Dépense réelle (optionnel)", min_value=0, max_value=100000, value=0, step=100)
+        real_expenditure = st.number_input("Dépense réelle (optionnel)", min_value=0, max_value=100000, value=0, step=100, help="Dépense réelle pour comparaison")
         submit_button = st.form_submit_button("💡 Prédire", use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     if submit_button:
         with st.spinner("Prédiction en cours..."):
             if loading_animation:
-                st_lottie(loading_animation, height=80, key="loading")
+                st_lottie(loading_animation, height=100, key="loading")
             else:
-                st.markdown("<p style='text-align:center; color:#6b7280;'>Chargement...</p>", unsafe_allow_html=True)
+                st.markdown("<p style='text-align:center; color:#4b5563; font-size:0.9rem;'>Chargement...</p>", unsafe_allow_html=True)
             input_df = pd.DataFrame({
                 'income': [income],
                 'share': [share],
@@ -376,21 +492,26 @@ elif selected == "Prédiction":
             y_pred = scaler_y.inverse_transform(y_pred_scaled.reshape(-1, 1)).ravel()[0]
             st.markdown("<div class='section-card card-fade'>", unsafe_allow_html=True)
             st.markdown("<h2 class='section-title' style='text-align:center;'>Résultat de la Prédiction</h2>", unsafe_allow_html=True)
-            st.metric("Dépense Prédite ($)", f"{y_pred:,.2f}")
+            st.metric("Dépense Prédite ($)", f"{y_pred:,.2f}", delta_color="normal")
             if real_expenditure > 0:
                 st.metric("Dépense Réelle ($)", f"{real_expenditure:,.2f}", delta=f"{y_pred-real_expenditure:,.2f}")
                 fig = go.Figure()
                 fig.add_trace(go.Bar(
                     x=["Prédite", "Réelle"],
                     y=[y_pred, real_expenditure],
-                    marker_color=["#3b82f6", "#1e40af"]
+                    marker_color=["#2563eb", "#1e3a8a"],
+                    text=[f"{y_pred:,.2f}", f"{real_expenditure:,.2f}"],
+                    textposition="auto"
                 ))
                 fig.update_layout(
                     title="Prédiction vs Réalité",
                     yaxis_title="Dépense ($)",
                     template="plotly_white",
-                    height=300,
-                    margin=dict(l=20, r=20, t=50, b=20)
+                    height=350,
+                    margin=dict(l=20, r=20, t=50, b=20),
+                    font=dict(family="Inter, sans-serif", color="#1f2937"),
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    paper_bgcolor="rgba(0,0,0,0)"
                 )
                 st.plotly_chart(fig, use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
@@ -400,7 +521,7 @@ elif selected == "Analyse":
     st.markdown("""
         <div class='header-container card-fade'>
             <h1 class='section-title' style='color:white;'>📊 Tableau de Bord Analytique</h1>
-            <p style='font-size:1.1rem;'>Explorez les performances du modèle et les tendances clés des données.</p>
+            <p style='font-size:1.2rem; color:#f8fafc;'>Explorez les performances du modèle et découvrez les tendances clés des données.</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -419,30 +540,27 @@ elif selected == "Analyse":
     mae = mean_absolute_error(y, y_pred)
     r2 = r2_score(y, y_pred)
 
+    st.markdown("<div class='metric-card card-fade'>", unsafe_allow_html=True)
+    st.markdown("<h3 style='font-family:Poppins, sans-serif;'>✨ Performance du Modèle</h3>", unsafe_allow_html=True)
     if metrics:
         st.markdown(f"""
-            <div class="metric-card card-fade">
-                <h3>✨ Performance du Modèle</h3>
-                <ul class="metric-list">
-                    <li><b>RMSE (test)</b>: {metrics.get('rmse', 'N/A'):.2f}</li>
-                    <li><b>MAE (test)</b>: {metrics.get('mae', 'N/A'):.2f}</li>
-                    <li><b>R² (test)</b>: {metrics.get('r2', 'N/A'):.3f}</li>
-                    {f"<li><b>Score CV</b>: {metrics['cv_score']:.3f}</li>" if 'cv_score' in metrics else ""}
-                </ul>
-            </div>
+            <ul class="metric-list">
+                <li><b>RMSE (test)</b>: {metrics.get('rmse', 'N/A'):.2f}</li>
+                <li><b>MAE (test)</b>: {metrics.get('mae', 'N/A'):.2f}</li>
+                <li><b>R² (test)</b>: {metrics.get('r2', 'N/A'):.3f}</li>
+                {f"<li><b>Score CV</b>: {metrics['cv_score']:.3f}</li>" if 'cv_score' in metrics else ""}
+            </ul>
         """, unsafe_allow_html=True)
     else:
         st.markdown(f"""
-            <div class="metric-card card-fade">
-                <h3>✨ Performance du Modèle</h3>
-                <p>(Métriques calculées sur l'ensemble des données)</p>
-                <ul class="metric-list">
-                    <li><b>RMSE</b>: {rmse:.2f}</li>
-                    <li><b>MAE</b>: {mae:.2f}</li>
-                    <li><b>R²</b>: {r2:.3f}</li>
-                </ul>
-            </div>
+            <p style='color:#f8fafc; font-size:0.9rem;'>(Métriques calculées sur l'ensemble des données)</p>
+            <ul class="metric-list">
+                <li><b>RMSE</b>: {rmse:.2f}</li>
+                <li><b>MAE</b>: {mae:.2f}</li>
+                <li><b>R²</b>: {r2:.3f}</li>
+            </ul>
         """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<hr class='section-sep'/><div class='section-title-visual'>Analyse Visuelle</div>", unsafe_allow_html=True)
 
@@ -450,21 +568,29 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>1. Prédictions vs Valeurs Réelles</h4>
-            <p style='color:#6b7280;'>Chaque point représente un client. Plus les points sont proches de la diagonale, plus la prédiction est précise.</p>
+            <p style='color:#4b5563; font-size:0.9rem;'>Chaque point représente un client. La proximité avec la diagonale indique une meilleure précision.</p>
     """, unsafe_allow_html=True)
     fig1 = px.scatter(
         x=y, y=y_pred,
         labels={'x': 'Valeur Réelle ($)', 'y': 'Valeur Prédite ($)'},
-        color_discrete_sequence=["#3b82f6"],
-        template="plotly_white"
+        color_discrete_sequence=["#2563eb"],
+        template="plotly_white",
+        opacity=0.7
     )
     fig1.add_shape(
         type="line",
         x0=y.min(), y0=y.min(),
         x1=y.max(), y1=y.max(),
-        line=dict(color="#d4af37", dash="dash")
+        line=dict(color="#ca8a04", dash="dash", width=2)
     )
-    fig1.update_layout(showlegend=False, height=350, margin=dict(l=20, r=20, t=30, b=20))
+    fig1.update_layout(
+        showlegend=False,
+        height=400,
+        margin=dict(l=20, r=20, t=30, b=20),
+        font=dict(family="Inter, sans-serif", color="#1f2937"),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)"
+    )
     st.plotly_chart(fig1, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -472,18 +598,21 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>2. Distribution des Dépenses</h4>
-            <p style='color:#6b7280;'>Répartition des dépenses annuelles des clients.</p>
+            <p style='color:#4b5563; font-size:0.9rem;'>Répartition des dépenses annuelles des clients.</p>
     """, unsafe_allow_html=True)
     fig2 = px.histogram(
         df, x="expenditure", nbins=40,
-        color_discrete_sequence=["#1e40af"],
+        color_discrete_sequence=["#1e3a8a"],
         template="plotly_white"
     )
     fig2.update_layout(
         xaxis_title="Dépense Annuelle ($)",
         yaxis_title="Nombre de Clients",
-        height=300,
-        margin=dict(l=20, r=20, t=30, b=20)
+        height=350,
+        margin=dict(l=20, r=20, t=30, b=20),
+        font=dict(family="Inter, sans-serif", color="#1f2937"),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)"
     )
     st.plotly_chart(fig2, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -492,7 +621,7 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>3. Importance des Variables</h4>
-            <p style='color:#6b7280;'>Variables les plus influentes dans le modèle de prédiction.</p>
+            <p style='color:#4b5563; font-size:0.9rem;'>Facteurs clés influençant les prédictions du modèle.</p>
     """, unsafe_allow_html=True)
     if hasattr(model, "feature_importances_"):
         importances = model.feature_importances_
@@ -500,15 +629,21 @@ elif selected == "Analyse":
         imp_df = pd.DataFrame({"Variable": features, "Importance": importances})
         imp_df = imp_df.sort_values("Importance", ascending=True)
         fig3 = px.bar(
-            imp_df, 
-            x="Importance", y="Variable", 
-            orientation="h", 
+            imp_df,
+            x="Importance", y="Variable",
+            orientation="h",
             color="Importance",
-            color_continuous_scale=["#3b82f6", "#1e40af"],
+            color_continuous_scale=["#2563eb", "#1e3a8a"],
             template="plotly_white",
-            height=350
+            height=400
         )
-        fig3.update_layout(margin=dict(l=20, r=20, t=30, b=20), coloraxis_showscale=False)
+        fig3.update_layout(
+            margin=dict(l=20, r=20, t=30, b=20),
+            font=dict(family="Inter, sans-serif", color="#1f2937"),
+            coloraxis_showscale=False,
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)"
+        )
         st.plotly_chart(fig3, use_container_width=True)
     else:
         st.info("L'importance des variables n'est pas disponible pour ce modèle.")
@@ -518,21 +653,24 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>4. Dépenses par Statut de Propriétaire</h4>
-            <p style='color:#6b7280;'>Comparaison des dépenses entre propriétaires et non-propriétaires.</p>
+            <p style='color:#4b5563; font-size:0.9rem;'>Comparaison des dépenses selon le statut de propriété.</p>
     """, unsafe_allow_html=True)
     fig4 = px.box(
-        df, x="owner", y="expenditure", 
-        color="owner", 
-        color_discrete_sequence=["#3b82f6", "#1e40af"],
+        df, x="owner", y="expenditure",
+        color="owner",
+        color_discrete_sequence=["#2563eb", "#1e3a8a"],
         points="all",
         template="plotly_white",
-        height=320
+        height=350
     )
     fig4.update_layout(
         xaxis_title="Statut de Propriétaire",
         yaxis_title="Dépense Annuelle ($)",
         showlegend=False,
-        margin=dict(l=20, r=20, t=30, b=20)
+        margin=dict(l=20, r=20, t=30, b=20),
+        font=dict(family="Inter, sans-serif", color="#1f2937"),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)"
     )
     st.plotly_chart(fig4, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -541,18 +679,23 @@ elif selected == "Analyse":
     st.markdown("""
         <div class="visual-card card-fade">
             <h4 class='section-title'>5. Matrice de Corrélation</h4>
-            <p style='color:#6b7280;'>Relations linéaires entre les variables du jeu de données.</p>
+            <p style='color:#4b5563; font-size:0.9rem;'>Relations linéaires entre les variables du jeu de données.</p>
     """, unsafe_allow_html=True)
     corr = df.select_dtypes(include=[np.number]).corr()
     fig5 = px.imshow(
-        corr, 
-        text_auto=".2f", 
-        color_continuous_scale=["#f9fafb", "#3b82f6"],
-        aspect="auto", 
+        corr,
+        text_auto=".2f",
+        color_continuous_scale=["#f8fafc", "#2563eb"],
+        aspect="auto",
         template="plotly_white",
-        height=400
+        height=450
     )
-    fig5.update_layout(margin=dict(l=20, r=20, t=30, b=20))
+    fig5.update_layout(
+        margin=dict(l=20, r=20, t=30, b=20),
+        font=dict(family="Inter, sans-serif", color="#1f2937"),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)"
+    )
     st.plotly_chart(fig5, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -561,24 +704,25 @@ elif selected == "À Propos":
     st.markdown("""
         <div class='header-container card-fade'>
             <h1 class='section-title' style='color:white;'>À Propos</h1>
-            <p style='font-size:1.1rem;'>Découvrez le créateur et le projet.</p>
+            <p style='font-size:1.2rem; color:#f8fafc;'>Découvrez le créateur et l'histoire derrière ce projet.</p>
         </div>
     """, unsafe_allow_html=True)
-    col1, col2 = st.columns([1, 2], gap="medium")
+    col1, col2 = st.columns([1, 2], gap="large")
     with col1:
         if about_animation:
-            st_lottie(about_animation, height=180, key="about_animation")
+            st_lottie(about_animation, height=200, key="about_animation")
         else:
-            st.markdown("<p style='text-align:center; color:#6b7280;'>Animation non disponible</p>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align:center; color:#4b5563; font-size:0.9rem;'>Animation non disponible</p>", unsafe_allow_html=True)
         st.image(
             "https://avatars.githubusercontent.com/u/TheBeyonder237",
-            width=150,
+            width=160,
             caption="Ngoue David",
             output_format="auto",
-            use_container_width=False
+            use_column_width=False,
+            cls="about-avatar"
         )
         st.markdown("""
-        <div style='text-align:center; margin-top:1rem;'>
+        <div style='text-align:center; margin-top:1.5rem;'>
             <button class='about-contact-btn' onclick="window.open('mailto:ngouedavidrogeryannick@gmail.com')">📧 Email</button>
             <button class='about-contact-btn' onclick="window.open('https://github.com/TheBeyonder237')">🌐 GitHub</button>
         </div>
@@ -587,30 +731,32 @@ elif selected == "À Propos":
         st.markdown("""
         <div class='section-card card-fade'>
             <h2 class='section-title'>Qui suis-je ?</h2>
-            <p>Passionné par l'IA et les données, je poursuis un Master en IA et Big Data, travaillant sur des solutions innovantes en finance et santé.</p>
+            <p style='color:#4b5563; font-size:1rem;'>Passionné par l'IA et les données, je suis étudiant en Master IA et Big Data, développant des solutions innovantes pour la finance et la santé.</p>
             <h3 class='section-title'>Compétences</h3>
-            <span class='badge'>Python</span>
-            <span class='badge'>Machine Learning</span>
-            <span class='badge'>Deep Learning</span>
-            <span class='badge'>NLP</span>
-            <span class='badge'>Data Science</span>
-            <span class='badge'>Cloud Computing</span>
-            <span class='badge'>Streamlit</span>
-            <span class='badge'>Scikit-learn</span>
-            <span class='badge'>XGBoost</span>
-            <span class='badge'>Pandas</span>
-            <span class='badge'>Plotly</span>
-            <span class='badge'>SQL</span>
-            <h3 class='section-title' style='margin-top:1rem;'>Projets Récents</h3>
-            <ul style='font-size:0.95rem;'>
-                <li><b>💸 Prédicteur de Dépenses par Carte de Crédit</b> : Application de prédiction des dépenses par IA.</li>
-                <li><b>🫀 HeartGuard AI</b> : Prédiction des risques cardiaques par IA.</li>
-                <li><b>🔊 Multi-IA</b> : Plateforme multi-modèles pour génération de texte, synthèse vocale et traduction.</li>
+            <div style='display:flex; flex-wrap:wrap; gap:0.5rem;'>
+                <span class='badge'>Python</span>
+                <span class='badge'>Machine Learning</span>
+                <span class='badge'>Deep Learning</span>
+                <span class='badge'>NLP</span>
+                <span class='badge'>Data Science</span>
+                <span class='badge'>Cloud Computing</span>
+                <span class='badge'>Streamlit</span>
+                <span class='badge'>Scikit-learn</span>
+                <span class='badge'>XGBoost</span>
+                <span class='badge'>Pandas</span>
+                <span class='badge'>Plotly</span>
+                <span class='badge'>SQL</span>
+            </div>
+            <h3 class='section-title' style='margin-top:1.5rem;'>Projets Récents</h3>
+            <ul style='font-size:0.95rem; color:#4b5563;'>
+                <li><b>💸 Prédicteur de Dépenses par Carte de Crédit</b> : Application IA pour anticiper les dépenses.</li>
+                <li><b>🫀 HeartGuard AI</b> : Prédiction des risques cardiaques via l'IA.</li>
+                <li><b>🔊 Multi-IA</b> : Plateforme intégrant texte, voix et traduction.</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
     st.markdown("""
-        <div style='text-align: center; color: #6b7280; padding: 1.5rem;'>
+        <div class='footer'>
             Développé avec ❤️ par Ngoue David
         </div>
     """, unsafe_allow_html=True)
