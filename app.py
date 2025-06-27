@@ -321,7 +321,7 @@ if selected == "Accueil":
 elif selected == "Prédiction":
     st.markdown("""
         <divsubj class='header-container card-fade'>
-            <h1 class='section-title' style='color:white;'>🔮 Prédiction des Dépenses</h1>
+            <h1 class='section-title' style='color:black;'>🔮 Prédiction des Dépenses</h1>
             <p style='font-size:1.1rem;'>Entrez les informations du client pour estimer ses dépenses annuelles par carte de crédit.</p>
         </div>
     """, unsafe_allow_html=True)
