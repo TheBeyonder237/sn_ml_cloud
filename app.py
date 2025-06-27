@@ -18,7 +18,16 @@ def load_model():
         data = pickle.load(f)
     return data['model'], data['scaler_X'], data['scaler_y'], data.get('metrics', None)
 
-def load_lottieurl(url: str, fallback_file: str = None):
+def load_lottieurl(url: str, local_file: str = None):
+    # Try loading local file first
+    if local_file and os.path.exists(local_file):
+        try:
+            with open(local_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            st.warning(f"Erreur lors du chargement du fichier local {local_file} : {str(e)}")
+    
+    # Fallback to URL if local file fails or doesn't exist
     try:
         r = requests.get(url, timeout=5)
         if r.status_code == 200:
@@ -26,29 +35,21 @@ def load_lottieurl(url: str, fallback_file: str = None):
         else:
             st.warning(f"Échec du chargement de l'animation depuis l'URL : {url}. Code de statut : {r.status_code}")
     except Exception as e:
-        st.warning(f"Erreur lors du chargement de l'animation : {str(e)}")
-    
-    # Fallback to local file if provided
-    if fallback_file and os.path.exists(fallback_file):
-        try:
-            with open(fallback_file, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            st.error(f"Erreur lors du chargement du fichier de secours : {str(e)}")
+        st.warning(f"Erreur lors du chargement de l'animation depuis l'URL : {str(e)}")
     return None
 
 # --------- ANIMATIONS ---------
-# Using verified Lottiefiles URLs with local fallback paths
+# Prioritize local files, with new URLs as fallback
 credit_animation = load_lottieurl(
-    "https://assets4.lottiefiles.com/packages/lf20_uwos7qni.json",  # Alternative finance-related animation
+    "https://lottie.host/8f7a5303-d6fc-4f53-a251-83e668af0dde/K2g0gSOKlQ.json",  # Finance-related animation
     "animations/credit_animation.json"
 )
 loading_animation = load_lottieurl(
-    "https://assets3.lottiefiles.com/packages/lf20_w51pcehl.json",  # Alternative loading animation
+    "https://lottie.host/7b6e1d43-4b53-4124-90e0-2a0f10d4eaff/6q3nNaM8zT.json",  # Loading animation
     "animations/loading_animation.json"
 )
 about_animation = load_lottieurl(
-    "https://assets1.lottiefiles.com/packages/lf20_jzfgcl4z.json",  # Alternative profile animation
+    "https://lottie.host/4e8f2a3b-0e32-4a98-9e1c-6e94e5d39e2a/6d5w1O8pY8.json",  # Profile-related animation
     "animations/about_animation.json"
 )
 
@@ -228,7 +229,7 @@ st.markdown("""
         background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
         color: white;
         padding: 2rem;
-        border-radius: 12.Worldpx;
+        border-radius: 12px;
         text-align: center;
         margin-bottom: 2rem;
     }
@@ -319,7 +320,7 @@ if selected == "Accueil":
 # --------- PRÉDICTION ---------
 elif selected == "Prédiction":
     st.markdown("""
-        <div class='header-container card-fade'>
+        <divsubj class='header-container card-fade'>
             <h1 class='section-title' style='color:white;'>🔮 Prédiction des Dépenses</h1>
             <p style='font-size:1.1rem;'>Entrez les informations du client pour estimer ses dépenses annuelles par carte de crédit.</p>
         </div>
